@@ -4,6 +4,7 @@ CXXFLAGS := -std=c++17 -O3 -Wall -Wextra -pedantic
 
 # Directories
 SRC_DIR := src
+TST_DIR := tests
 BIN			:= chess
 
 # Source files
@@ -11,7 +12,8 @@ SRCS := $(SRC_DIR)/main.cpp \
 				$(SRC_DIR)/position.cpp \
 				$(SRC_DIR)/movegen.cpp \
 				$(SRC_DIR)/perft.cpp \
-				$(SRC_DIR)/move.cpp
+				$(SRC_DIR)/move.cpp \
+				$(TST_DIR)/perft_tests.cpp
 
 # Object files
 OBJS := $(SRCS:.cpp=.o)

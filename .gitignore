@@ -1,0 +1,26 @@
+# Build artifacts
+*.o
+*.obj
+*.a
+*.out
+
+# Engine binary
+chess
+
+# IDE clutter
+.vscode/
+.idea/
+*.code-workspace/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# CMake (Planned)
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
