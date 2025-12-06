@@ -83,17 +83,18 @@ This complies with the UCI protocol disgned by Rudolf Huber and Stefan Meyer-Kah
 | 7     | 3,195,901,860 |
 
 ## Project Structure
+```
 src/
- ├─ main.cpp         # game loop UI
- ├─ position.cpp/h   # board state, make/undo
- ├─ move.cpp/h       # move encoding + strings
- ├─ movegen.cpp/h    # pseudo/legal move generation
- ├─ search.cpp/h     # alpha-beta search
- ├─ perft.cpp/h      # perft driver
- ├─ utils.cpp/h      # board printing
+ ├─ main.cpp
+ ├─ position.cpp / position.h
+ ├─ move.cpp / move.h
+ ├─ movegen.cpp / movegen.h
+ ├─ search.cpp / search.h
+ ├─ perft.cpp / perft.h
+ ├─ utils.cpp / utils.h
 tests/
- ├─ perft_tests.cpp  # perft validation suite
-
+ ├─ perft_tests.cpp
+```
 
 ## Contributing
 Don't. This is purely for my own recreational and learning purposes.
