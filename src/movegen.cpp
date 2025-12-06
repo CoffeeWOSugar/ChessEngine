@@ -183,31 +183,56 @@ static void gen_king_moves(const Position &pos, std::vector<Move> &moves, int sq
 }
 
 static void gen_castling(const Position &pos, std::vector<Move> &moves, int kingSq, int kingPiece) {
-  Color us = pieceColor(kingPiece);
+  Color us   = pieceColor(kingPiece);
+  Color them = opposite(us);
   int rights = pos.castlingRights;
 
-  if (us == WHITE) {
-    int e1 = 0x04, f1 = 0x05, g1 = 0x06, d1 = 0x03, c1 = 0x02;
+  if (us == WHITE && kingSq == Position::makeSquare(4, 0)) {
+    int e1 = kingSq;
+    int f1 = e1 + 1;
+    int g1 = e1 + 2;
+    int b1 = e1 - 3;
+    int c1 = e1 - 2;
+    int d1 = e1 - 1;
+
     if (rights & WK_CASTLE) {
-      if (pos.board[f1] == EMPTY && pos.board[g1] == EMPTY) {
+      if (pos.board[f1] == EMPTY && pos.board[g1] == EMPTY
+          && !pos.isSquareAttacked(e1, them)
+          && !pos.isSquareAttacked(f1, them)
+          && !pos.isSquareAttacked(g1, them)) {
         moves.push_back(make_move(e1, g1, kingPiece, EMPTY, EMPTY, MF_CASTLING));
       }
     }
     if (rights & WQ_CASTLE) {
-      if (pos.board[d1] == EMPTY && pos.board[c1] == EMPTY && pos.board[0x01] == EMPTY) {
+      if (pos.board[d1] == EMPTY && pos.board[c1] == EMPTY && pos.board[b1] == EMPTY
+          && !pos.isSquareAttacked(e1, them)
+          && !pos.isSquareAttacked(d1, them)
+          && !pos.isSquareAttacked(c1, them)) {
         moves.push_back(make_move(e1, c1, kingPiece, EMPTY, EMPTY, MF_CASTLING));
       }
     }
   }
-  else {
-    int e8 = 0x74, f8 = 0x75, g8 = 0x76, d8 = 0x73, c8 = 0x72;
+  else if (us == BLACK && kingSq == Position::makeSquare(4, 7)){
+    int e8 = kingSq;
+    int f8 = e8 + 1;
+    int g8 = e8 + 2;
+    int b8 = e8 - 3;
+    int c8 = e8 - 2;
+    int d8 = e8 - 1;
+
     if (rights & BK_CASTLE) {
-      if (pos.board[f8] == EMPTY && pos.board[g8] == EMPTY) {
+      if (pos.board[f8] == EMPTY && pos.board[g8] == EMPTY
+          && !pos.isSquareAttacked(e8, them)
+          && !pos.isSquareAttacked(f8, them)
+          && !pos.isSquareAttacked(g8, them)) {
         moves.push_back(make_move(e8, g8, kingPiece, EMPTY, EMPTY, MF_CASTLING));
       }
     }
     if (rights & BQ_CASTLE) {
-      if (pos.board[d8] == EMPTY && pos.board[c8] == EMPTY && pos.board[0x71] == EMPTY) {
+      if (pos.board[d8] == EMPTY && pos.board[c8] == EMPTY && pos.board[b8] == EMPTY
+          && !pos.isSquareAttacked(e8, them)
+          && !pos.isSquareAttacked(d8, them)
+          && !pos.isSquareAttacked(c8, them)) {
         moves.push_back(make_move(e8, c8, kingPiece, EMPTY, EMPTY, MF_CASTLING));
       }
     }
@@ -271,11 +296,10 @@ void GenerateLegalMoves(const Position &pos, std::vector<Move> &moves) {
   std::vector<Move> pseudo;
   GeneratePseudoLegalMoves(pos, pseudo);
   moves.clear();
-  Position tmp = pos;
   for (const Move &m : pseudo) {
+    Position tmp = pos;
     if (tmp.makeMove(m)) {
       moves.push_back(m);
-      tmp.undoMove(m);
     }
   }
 }

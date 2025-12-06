@@ -43,16 +43,16 @@ bool Position::inCheck(Color c) const {
 
   // Pawn Attacks
   if (enemy == WHITE) {
-    int sq1 = kingSq + 15;
-    int sq2 = kingSq + 17;
+    int sq1 = kingSq - 15;
+    int sq2 = kingSq - 17;
     if (Position::isOnBoard(sq1) && board[sq1] == WP) return true;
-    if (Position::isOnBoard[sq2] && board[sq2] == WP) return true;
+    if (Position::isOnBoard(sq2) && board[sq2] == WP) return true;
   }
   else {
-    int sq1 = kingSq - 17;
-    int sq2 = kingSq - 15;
+    int sq1 = kingSq + 17;
+    int sq2 = kingSq + 15;
     if (Position::isOnBoard(sq1) && board[sq1] == BP) return true;
-    if (Position::isOnBoard[sq2] && board[sq2] == BP) return true;
+    if (Position::isOnBoard(sq2) && board[sq2] == BP) return true;
   }
 
   // Knight Attacks
@@ -70,7 +70,7 @@ bool Position::inCheck(Color c) const {
   for (int off : BishopOffsets) {
     int sq = kingSq;
     while (true) {
-      sq + off;
+      sq += off;
       if (!Position::isOnBoard(sq)) break;
       int p = board[sq];
       if (p == EMPTY) continue;
@@ -234,7 +234,7 @@ bool Position::makeMove(const Move &m) {
   }
   else if (capturedPiece == BR) {
     if (capturedSq == SQ_A8) castlingRights &= ~BQ_CASTLE;
-    else if (capturedSq == SQ_H1) castlingRights &= ~BK_CASTLE;
+    else if (capturedSq == SQ_H8) castlingRights &= ~BK_CASTLE;
   }
 
   // Handling castling rook moves
@@ -275,20 +275,21 @@ bool Position::makeMove(const Move &m) {
   // Legality check?
   Color us = (sideToMove == WHITE ? BLACK : WHITE);
   if (inCheck(us)) {
-    undoMove(m);
+    undoMove();
     return false;
   }
   
   return true;
 }
 
-void Position::undoMove(const Move &m) {
+void Position::undoMove() {
   if (stateStack.empty())
     return;
 
   State st = stateStack.back();
   stateStack.pop_back();
 
+  const Move &m = st.move;
   const int from  = m.from;
   const int to    = m.to;
   const int piece = m.piece;
@@ -310,7 +311,7 @@ void Position::undoMove(const Move &m) {
 
     if (piece == WK) {
       if (to == SQ_G1) {
-        board[SQ_G1] = WR;
+        board[SQ_H1] = WR;
         board[SQ_F1] = EMPTY;
       }
       else if (to == SQ_C1) {
@@ -344,3 +345,67 @@ void Position::undoMove(const Move &m) {
     }
   }
 }
+
+bool Position::isSquareAttacked(int sq, Color by) const {
+    // Pawn attacks
+    if (by == WHITE) {
+        int sq1 = sq - 15;
+        int sq2 = sq - 17;
+        if (isOnBoard(sq1) && board[sq1] == WP) return true;
+        if (isOnBoard(sq2) && board[sq2] == WP) return true;
+    } else {
+        int sq1 = sq + 15;
+        int sq2 = sq + 17;
+        if (isOnBoard(sq1) && board[sq1] == BP) return true;
+        if (isOnBoard(sq2) && board[sq2] == BP) return true;
+    }
+
+    // Knight attacks
+    for (int off : KnightOffsets) {
+        int s = sq + off;
+        if (!isOnBoard(s)) continue;
+        int p = board[s];
+        if (p != EMPTY && pieceColor(p) == by && pieceType(p) == WN)
+            return true;
+    }
+
+    // Bishop & diagonal queen attacks
+    for (int off : BishopOffsets) {
+        int s = sq;
+        while (true) {
+            s += off;
+            if (!isOnBoard(s)) break;
+            int p = board[s];
+            if (p == EMPTY) continue;
+            if (pieceColor(p) == by && (pieceType(p) == WB || pieceType(p) == WQ))
+                return true;
+            break; // blocked
+        }
+    }
+
+    // Rook & orthogonal queen attacks
+    for (int off : RookOffsets) {
+        int s = sq;
+        while (true) {
+            s += off;
+            if (!isOnBoard(s)) break;
+            int p = board[s];
+            if (p == EMPTY) continue;
+            if (pieceColor(p) == by && (pieceType(p) == WR || pieceType(p) == WQ))
+                return true;
+            break; // blocked
+        }
+    }
+
+    // King adjacency attacks
+    for (int off : KingOffsets) {
+        int s = sq + off;
+        if (!isOnBoard(s)) continue;
+        int p = board[s];
+        if (p != EMPTY && pieceColor(p) == by && pieceType(p) == WK)
+            return true;
+    }
+
+    return false;
+}
+

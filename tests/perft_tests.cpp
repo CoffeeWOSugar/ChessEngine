@@ -2,32 +2,42 @@
 #include "../src/position.h"
 #include "../src/perft.h"
 #include <iostream>
-#include <string>
+#include <vector>
 
 void run_perft_tests() {
-    Position pos;
-    pos.setStartPosition();
-
     std::cout << "Running Perft tests..." << std::endl;
 
-    auto check = [&](int depth, u64 expected) -> bool {
-        u64 nodes = Perft(pos, depth);
-        if (nodes != expected) {
-            std::cerr << "FAILED: Perft(" << depth << "): expected "
-                      << expected << ", got " << nodes << std::endl;
-            return false;
-        }
-        std::cout << "OK: Perft(" << depth << ") = " << nodes << std::endl;
-        return true;
+    // 1) Define test cases
+    std::vector<PerftCase> cases = {
+        {"Startpos", 1, 20ULL},
+        {"Startpos", 2, 400ULL},
+        {"Startpos", 3, 8902ULL},
+        {"Startpos", 4, 197281ULL},
+        {"Startpos", 5, 4865609ULL},
+        {"Startpos", 6, 119060324ULL},
+        {"Startpos", 7, 3195901860ULL},
     };
 
     bool all_good = true;
-    all_good &= check(1, 20);
-    all_good &= check(2, 400);
-    all_good &= check(3, 8902);
-    all_good &= check(4, 197281);
-    all_good &= check(5, 4865609);
-    all_good &= check(6, 119060324);
+
+    // 2) Loop over cases
+    for (const auto &tc : cases) {
+        Position pos;
+
+        pos.setStartPosition();
+
+        u64 nodes = Perft(pos, tc.depth);
+
+        if (nodes != tc.expected) {
+            std::cerr << "FAILED: [" << tc.name << "] Perft("
+                      << tc.depth << "): expected "
+                      << tc.expected << ", got " << nodes << '\n';
+            all_good = false;
+        } else {
+            std::cout << "OK: [" << tc.name << "] Perft("
+                      << tc.depth << ") = " << nodes << '\n';
+        }
+    }
 
     if (!all_good) {
         std::cerr << "Some Perft tests FAILED!" << std::endl;

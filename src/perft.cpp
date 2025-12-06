@@ -5,25 +5,30 @@ u64 Perft(Position &pos, int depth) {
   if (depth == 0)
     return 1ULL;
 
-  std::vector<Move> moves;
-  GenerateLegalMoves(pos, moves);
+  size_t stack_before = pos.stateStack.size();
 
-  if (depth == 1)
-    return (u64)moves.size();
+  std::vector<Move> moves;
+  GeneratePseudoLegalMoves(pos, moves);
 
   u64 nodes = 0;
   for (const Move &m : moves) {
     if (!pos.makeMove(m))
       continue;
     nodes += Perft(pos, depth - 1);
-    pos.undoMove(m);
+    pos.undoMove();
+  }
+
+  // Sanity check
+  if (pos.stateStack.size() != stack_before) {
+    std::cerr << "State stack imbalance detected!\n";
+    std::abort();
   }
   return nodes;
 }
 
 u64 PerftDivide(Position &pos, int depth) {
   std::vector<Move> moves;
-  GenerateLegalMoves(pos, moves);
+  GeneratePseudoLegalMoves(pos, moves);
 
   u64 total = 0;
   for (const Move &m : moves) {
@@ -31,7 +36,7 @@ u64 PerftDivide(Position &pos, int depth) {
       continue;
 
     u64 nodes = Perft(pos, depth-1);
-    pos.undoMove(m);
+    pos.undoMove();
 
     total += nodes;
     std::cout << MoveToString(m) << ": " << nodes << std::endl;

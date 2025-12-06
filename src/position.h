@@ -57,7 +57,9 @@ class Position {
     }
 
     bool makeMove(const Move &m); // return false if illegal
-    void undoMove(const Move &m); // undo last move
+    void undoMove(); // undo last move
+
+    bool isSquareAttacked(int sq, Color by) const;
 
     bool inCheck(Color c) const;  //might be needed for legal move generation
 };

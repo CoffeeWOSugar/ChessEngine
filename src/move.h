@@ -14,7 +14,7 @@ struct Move {
 enum MoveFlags : uint8_t {
   MF_NONE = 0,
   MF_CAPTURE = 1 << 0,
-  MF_EN_PASSANT = 1 << 0,
+  MF_EN_PASSANT = 1 << 1,
   MF_CASTLING = 1 << 2,
   MF_PROMOTION = 1 << 3
 };
