@@ -1,0 +1,9 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: ForIndentation       # tabs for indent, spaces for alignment
+BreakBeforeBraces: Attach
+ColumnLimit: 100
+AllowShortIfStatementsOnASingleLine: false
+SortIncludes: false
+

@@ -31,3 +31,9 @@ $(BIN): $(OBJS)
 .PHONY: clean
 clean:
 	rm -rf $(OBJS) $(BIN)
+
+# Format
+.PHONY: format
+format:
+	clang-format -i $(SRC_DIR)/*.cpp $(SRC_DIR)/*.h $(TST_DIR)/*.cpp $(TST_DIR)/*.h
+

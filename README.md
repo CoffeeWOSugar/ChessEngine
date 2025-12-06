@@ -97,4 +97,4 @@ tests/
 ```
 
 ## Contributing
-Don't. This is purely for my own recreational and learning purposes.
+Don't. This is purely for my own recreation and learning purposes.
