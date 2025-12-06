@@ -13,6 +13,7 @@ SRCS := $(SRC_DIR)/main.cpp \
 				$(SRC_DIR)/movegen.cpp \
 				$(SRC_DIR)/perft.cpp \
 				$(SRC_DIR)/move.cpp \
+				$(SRC_DIR)/search.cpp \
 				$(TST_DIR)/perft_tests.cpp
 
 # Object files
