@@ -18,7 +18,7 @@ chess
 # Windows
 Thumbs.db
 
-# CMake (Planned)
+# CMake
 build/
 CMakeFiles/
 CMakeCache.txt

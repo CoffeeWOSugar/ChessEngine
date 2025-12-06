@@ -1,0 +1,15 @@
+# Build artifacts
+build
+CMakeCache.txt
+CMakeFiles
+*.o
+
+# VCS
+.git
+.gitignore
+
+# Other local stuff
+.vscode
+.idea
+*.swp
+
