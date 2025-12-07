@@ -52,15 +52,16 @@ This will produce ```build/chess``` which can be run as:
 #### Build the image
 ```bash
 # From the root where the Dockerfile lives.
-docker build -t your-docker-user/chess:latest .
+docker build -t chess-web:latest .
 ```
 
 #### Run locally
 ```bash
-docker run --rm -it your-docker-user/chess:latest .
+# Old version...
+#docker run --rm -it your-docker-user/chess:latest .
 ```
-or
 ```bash
+# New version!
 docker run --rm -p 8000:8000 chess-web
 ```
 ## Controls & Display
