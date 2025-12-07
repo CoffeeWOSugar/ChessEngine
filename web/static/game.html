@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Chess Engine – Game</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        background: #020617;
+        color: #e5e7eb;
+        margin: 0;
+      }
+      header {
+        padding: 1rem 2rem;
+        background: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 1.3rem;
+      }
+      header button {
+        cursor: pointer;
+        border: none;
+        border-radius: 999px;
+        padding: 0.4rem 1rem;
+        background: #1e293b;
+        color: #e5e7eb;
+        font-size: 0.9rem;
+      }
+      header button:hover {
+        background: #111827;
+      }
+      main {
+        padding: 1.5rem 2rem;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      .controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .controls input[type="text"] {
+        padding: 0.4rem 0.6rem;
+        border-radius: 0.5rem;
+        border: 1px solid #4b5563;
+        background: #020617;
+        color: #e5e7eb;
+      }
+      .controls button {
+        cursor: pointer;
+        border: none;
+        border-radius: 999px;
+        padding: 0.5rem 1.2rem;
+        font-size: 0.95rem;
+      }
+      .primary {
+        background: #22c55e;
+        color: #022c22;
+      }
+      .primary:hover {
+        background: #16a34a;
+      }
+      .secondary {
+        background: #1e293b;
+        color: #e5e7eb;
+      }
+      .secondary:hover {
+        background: #111827;
+      }
+      #output {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        background: #020617;
+        border: 1px solid #1f2937;
+        white-space: pre-wrap;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        min-height: 300px;
+      }
+      #status {
+        margin-top: 0.5rem;
+        color: #9ca3af;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Play Chess</h1>
+      <button onclick="goHome()">← Back to menu</button>
+    </header>
+    <main>
+      <div class="controls">
+        <button class="primary" onclick="newGame()">New Game</button>
+        <label>
+          Your move:
+          <input type="text" id="moveInput" placeholder="e2e4, e7e8q, ..." />
+        </label>
+        <button class="secondary" onclick="sendMove()">Submit</button>
+      </div>
+      <div id="status">No game started yet.</div>
+      <div id="output"></div>
+    </main>
+
+    <script>
+      function goHome() {
+        window.location.href = "/";
+      }
+
+      async function newGame() {
+        const statusEl = document.getElementById("status");
+        const outputEl = document.getElementById("output");
+        statusEl.textContent = "Starting new game...";
+        outputEl.textContent = "";
+        try {
+          const res = await fetch("/api/new-game", { method: "POST" });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || "HTTP " + res.status);
+          }
+          const data = await res.json();
+          statusEl.textContent = "Game started. You are White by default.";
+          outputEl.textContent = data.output || "";
+        } catch (e) {
+          statusEl.textContent = "Error starting game: " + e.message;
+        }
+      }
+
+      async function sendMove() {
+        const moveInput = document.getElementById("moveInput");
+        const statusEl = document.getElementById("status");
+        const outputEl = document.getElementById("output");
+        const move = moveInput.value.trim();
+        if (!move) {
+          statusEl.textContent = "Please enter a move like e2e4.";
+          return;
+        }
+
+        statusEl.textContent = "Sending move " + move + "...";
+
+        try {
+          const res = await fetch("/api/move", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ move }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || "HTTP " + res.status);
+          }
+          const data = await res.json();
+          outputEl.textContent = data.output || "";
+          statusEl.textContent = "Move applied.";
+          moveInput.value = "";
+        } catch (e) {
+          statusEl.textContent = "Error sending move: " + e.message;
+        }
+      }
+    </script>
+  </body>
+</html>
+

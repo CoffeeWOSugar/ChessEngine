@@ -59,7 +59,10 @@ docker build -t your-docker-user/chess:latest .
 ```bash
 docker run --rm -it your-docker-user/chess:latest .
 ```
-
+or
+```bash
+docker run --rm -p 8000:8000 chess-web
+```
 ## Controls & Display
 The board is displayed using prints to standard output using Unicode symbols:
 White: ```♔ ♕ ♖ ♗ ♘ ♙```

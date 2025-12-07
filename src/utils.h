@@ -78,50 +78,50 @@ inline const char *pieceToRepresentation(int p, bool symbol) {
 	return pieceToChar(p);
 }
 
-inline void printBoard(const Position &pos, bool symbol) {
-	std::cout << "\n  +-----------------+\n";
+inline void printBoard(const Position &pos, bool symbol, std::ostream &out = std::cout) {
+	out << "\n  +-----------------+\n";
 
 	for (int rank = 7; rank >= 0; --rank) {
-		std::cout << rank + 1 << " |";
+		out << rank + 1 << " |";
 		for (int file = 0; file < 8; ++file) {
 			int sq = Position::makeSquare(file, rank);
 			int p = pos.board[sq];
-			std::cout << " " << pieceToRepresentation(p, symbol);
+			out << " " << pieceToRepresentation(p, symbol);
 		}
-		std::cout << " |\n";
+		out << " |\n";
 	}
 
-	std::cout << "  +-----------------+\n";
-	std::cout << "		a b c d e f g h\n";
+	out << "  +-----------------+\n";
+	out << "		a b c d e f g h\n";
 
 	// Optional extra info:
-	std::cout << "Side to move: " << (pos.sideToMove == WHITE ? "White" : "Black") << "\n";
+	out << "Side to move: " << (pos.sideToMove == WHITE ? "White" : "Black") << "\n";
 
-	std::cout << "Castling rights: ";
+	out << "Castling rights: ";
 	if (pos.castlingRights == 0)
-		std::cout << "-";
+		out << "-";
 	else {
 		if (pos.castlingRights & WK_CASTLE)
-			std::cout << "K";
+			out << "K";
 		if (pos.castlingRights & WQ_CASTLE)
-			std::cout << "Q";
+			out << "Q";
 		if (pos.castlingRights & BK_CASTLE)
-			std::cout << "k";
+			out << "k";
 		if (pos.castlingRights & BQ_CASTLE)
-			std::cout << "q";
+			out << "q";
 	}
-	std::cout << "\n";
+	out << "\n";
 
-	std::cout << "EP square: ";
+	out << "EP square: ";
 	if (pos.epSquare == -1) {
-		std::cout << "-\n";
+		out << "-\n";
 	} else {
 		int file = pos.epSquare & 7;
 		int rank = pos.epSquare >> 4;
 		char fileChar = 'a' + file;
 		char rankChar = '1' + rank;
-		std::cout << fileChar << rankChar << " (" << pos.epSquare << ")\n";
+		out << fileChar << rankChar << " (" << pos.epSquare << ")\n";
 	}
 
-	std::cout << std::endl;
+	out << std::endl;
 }
