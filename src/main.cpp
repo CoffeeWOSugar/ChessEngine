@@ -3,6 +3,7 @@
 #include <vector>
 #include "position.h"
 #include "movegen.h"
+#include "perft.h"
 #include "../tests/perft_tests.h"
 #include "utils.h"
 #include "search.h"
@@ -98,6 +99,16 @@ bool parseUserMove(const Position &pos, const std::string &input, Move &outMove)
 int main(int argc, char *argv[]) {
 	if (argc > 1 && std::string(argv[1]) == "--run-tests") {
 		run_perft_tests();
+		return 0;
+	}
+
+	if (argc > 2 && std::string(argv[1]) == "--perft") {
+		int depth = std::stoi(argv[2]);
+		Position pos;
+		pos.setStartPosition();
+		u64 nodes = Perft(pos, depth);
+		// IMPORTANT: print only the number, one line, no extra text
+		std::cout << nodes << std::endl;
 		return 0;
 	}
 

@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Chess Engine Perft</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 600px;
+        margin: 2rem auto;
+      }
+      label, select, button {
+        font-size: 1rem;
+      }
+      #result {
+        margin-top: 1rem;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        min-height: 2rem;
+        white-space: pre-wrap;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Chess Engine Perft</h1>
+
+    <label for="depth">Depth:</label>
+    <select id="depth">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3" selected>3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+    </select>
+
+    <button id="runBtn">Run perft</button>
+
+    <div id="result">Result will appear here.</div>
+
+    <script>
+      async function runPerft() {
+        const depth = document.getElementById("depth").value;
+        const resultDiv = document.getElementById("result");
+        resultDiv.textContent = "Running perft(" + depth + ")...";
+
+        try {
+          const res = await fetch("/perft?depth=" + encodeURIComponent(depth));
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || "HTTP " + res.status);
+          }
+          const data = await res.json();
+          resultDiv.textContent =
+            "Perft(" + data.depth + ") = " + data.nodes.toLocaleString();
+        } catch (e) {
+          resultDiv.textContent = "Error: " + e.message;
+        }
+      }
+
+      document
+        .getElementById("runBtn")
+        .addEventListener("click", runPerft);
+    </script>
+  </body>
+</html>
+
