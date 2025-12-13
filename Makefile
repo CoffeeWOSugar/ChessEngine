@@ -1,6 +1,6 @@
 # Compiler and flags
 CXX 		 := g++
-CXXFLAGS := -std=c++17 -O3 -Wall -Wextra -pedantic
+CXXFLAGS := -std=c++20 -Iinclude -Wall -Wextra -pedantic
 
 # Directories
 SRC_DIR := src
@@ -14,6 +14,7 @@ SRCS := $(SRC_DIR)/main.cpp \
 				$(SRC_DIR)/perft.cpp \
 				$(SRC_DIR)/move.cpp \
 				$(SRC_DIR)/search.cpp \
+				$(SRC_DIR)/engine_session.cpp \
 				$(TST_DIR)/perft_tests.cpp
 
 # Object files

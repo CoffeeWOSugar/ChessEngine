@@ -188,7 +188,7 @@ bool searchBestMove(Position &pos, int maxDepth, const SearchLimits &limits, Mov
 		currentBest = bestMoveThisDepth;
 		foundAny = true;
 
-		std::cout << "Depth " << depth << " best score = " << currentBestScore << std::endl;
+		// std::cout << "Depth " << depth << " best score = " << currentBestScore << std::endl;
 	}
 
 end_search:

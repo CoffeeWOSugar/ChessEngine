@@ -40,35 +40,35 @@ inline const char *pieceToChar(int p) {
 inline const char *pieceToSymbol(int p) {
 	switch (p) {
 	case WP:
-		return u8"♙";
+		return "♙";
 	case WN:
-		return u8"♘";
+		return "♘";
 	case WB:
-		return u8"♗";
+		return "♗";
 	case WR:
-		return u8"♖";
+		return "♖";
 	case WQ:
-		return u8"♕";
+		return "♕";
 	case WK:
-		return u8"♔";
+		return "♔";
 
 	case BP:
-		return u8"♟";
+		return "♟";
 	case BN:
-		return u8"♞";
+		return "♞";
 	case BB:
-		return u8"♝";
+		return "♝";
 	case BR:
-		return u8"♜";
+		return "♜";
 	case BQ:
-		return u8"♛";
+		return "♛";
 	case BK:
-		return u8"♚";
+		return "♚";
 
 	case EMPTY:
-		return u8".";
+		return ".";
 	default:
-		return u8"?"; // for debugging weird values
+		return "?"; // for debugging weird values
 	}
 }
 

@@ -8,12 +8,12 @@
   <body class="game-body">
     <header class="app-header">
       <h1 class="app-header__title">Play Chess</h1>
-      <button class="header-btn" onclick="goHome()">← Back</button>
+      <button class="header-btn" id="backBtn">← Back</button>
     </header>
 
     <main class="app-main">
       <div class="game-controls">
-        <button class="btn btn-primary" onclick="newGame()">New Game</button>
+        <button class="btn btn-primary" id="newGameBtn">New Game</button>
         <label>
           Your move:
           <input
@@ -23,71 +23,17 @@
             autocomplete="off"
           />
         </label>
-        <button class="btn btn-secondary" onclick="sendMove()">Submit</button>
+        <button class="btn btn-secondary" id="submitBtn">Submit</button>
       </div>
 
       <div id="status" class="game-status">No game started yet.</div>
-      <div id="output" class="output-box game-output"></div>
+
+      <div id="board" class="board" aria-label="Chessboard"></div>
+
+      <div id="output" class="output-box game-output" style="margin-top: 16px;"></div>
     </main>
 
-    <script>
-      function goHome() { window.location.href = "/"; }
-
-      function updateOutput(text) {
-        const out = document.getElementById("output");
-        out.textContent = text || "";
-        out.scrollTop = out.scrollHeight;
-      }
-
-      function focusMoveInput() {
-        let el = document.getElementById("moveInput");
-        el.focus(); el.select();
-      }
-
-      async function newGame() {
-        let s = document.getElementById("status");
-        s.textContent = "Starting...";
-        updateOutput("");
-        try {
-          let res = await fetch("/api/new-game", { method: "POST" });
-          let data = await res.json();
-          updateOutput(data.output || "");
-          s.textContent = "Game started. You are White.";
-        } catch (e) {
-          s.textContent = "Error: " + e.message;
-        }
-        focusMoveInput();
-      }
-
-      async function sendMove() {
-        let move = moveInput.value.trim();
-        let s = document.getElementById("status");
-        if (!move) return;
-
-        try {
-          let res = await fetch("/api/move", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ move }),
-          });
-
-          let data = await res.json();
-          updateOutput(data.output || "");
-          s.textContent = "Move applied.";
-          moveInput.value = "";
-        } catch (e) {
-          s.textContent = "Error: " + e.message;
-        }
-
-        focusMoveInput();
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        moveInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") sendMove();
-        });
-        focusMoveInput();
-      });
-    </script>
+    <script src="/static/game.js"></script>
   </body>
 </html>
+

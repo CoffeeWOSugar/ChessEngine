@@ -9,7 +9,7 @@ This version of the engine works by implementing a simple Alpha-beta search with
 ### Prerequisites
 
 - A Computer.
-- C++17-compatible compiler (e.g. `g++` or `clang++`)
+- C++20-compatible compiler (e.g. `g++` or `clang++`)
 - CMake >= 3.16 (Optional)
 - Docker (Optional)
 - 600 ELO Chess knowledge (Optional)

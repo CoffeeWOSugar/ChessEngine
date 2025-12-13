@@ -1,6 +1,7 @@
 #include "position.h"
 #include "move.h"
 #include "types.h"
+#include "sstream"
 
 static constexpr int SQ_A1 = Position::makeSquare(0, 0);
 static constexpr int SQ_E1 = Position::makeSquare(4, 0);
@@ -426,4 +427,109 @@ bool Position::isSquareAttacked(int sq, Color by) const {
 	}
 
 	return false;
+}
+
+std::string Position::toFEN() const {
+	std::ostringstream fen;
+
+	// 1) Piece placement (rank 8 down to 1)
+	for (int rank = 7; rank >= 0; --rank) {
+		int emptyRun = 0;
+
+		for (int file = 0; file < 8; ++file) {
+			int sq = makeSquare(file, rank); // (rank<<4)|file
+			int p = board[sq];
+
+			char c = pieceToFenChar(p);
+			if (c == '\0') {
+				++emptyRun;
+			} else {
+				if (emptyRun > 0) {
+					fen << emptyRun;
+					emptyRun = 0;
+				}
+				fen << c;
+			}
+		}
+
+		if (emptyRun > 0)
+			fen << emptyRun;
+		if (rank > 0)
+			fen << '/';
+	}
+
+	// 2) Side to move
+	fen << ' ' << (sideToMove == WHITE ? 'w' : 'b');
+
+	// 3) Castling availability
+	fen << ' ';
+	std::string cr;
+	if (castlingRights & WK_CASTLE)
+		cr += 'K';
+	if (castlingRights & WQ_CASTLE)
+		cr += 'Q';
+	if (castlingRights & BK_CASTLE)
+		cr += 'k';
+	if (castlingRights & BQ_CASTLE)
+		cr += 'q';
+	fen << (cr.empty() ? "-" : cr);
+
+	// 4) En passant target square
+	// Convention: FEN stores the target square *behind* the pawn that advanced two squares.
+	fen << ' ' << (epSquare == -1 ? "-" : squareToString(epSquare));
+
+	// 5) Halfmove clock
+	fen << ' ' << halfmoveClock;
+
+	// 6) Fullmove number
+	fen << ' ' << fullmoveNumber;
+
+	return fen.str();
+}
+
+std::string Position::squareToString(int sq) {
+	if (sq < 0 || !isOnBoard(sq))
+		return "-";
+	int file = sq & 0x0F;        // 0..7
+	int rank = (sq >> 4) & 0x07; // 0..7
+	std::string s;
+	s += char('a' + file);
+	s += char('1' + rank);
+	return s;
+}
+
+char Position::pieceToFenChar(int p) {
+	switch (p) {
+	case EMPTY:
+		return '\0';
+
+	case WP:
+		return 'P';
+	case WN:
+		return 'N';
+	case WB:
+		return 'B';
+	case WR:
+		return 'R';
+	case WQ:
+		return 'Q';
+	case WK:
+		return 'K';
+
+	case BP:
+		return 'p';
+	case BN:
+		return 'n';
+	case BB:
+		return 'b';
+	case BR:
+		return 'r';
+	case BQ:
+		return 'q';
+	case BK:
+		return 'k';
+
+	default:
+		return '\0'; // Unknown piece code; treat as empty (or assert)
+	}
 }

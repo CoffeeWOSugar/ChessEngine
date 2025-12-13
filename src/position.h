@@ -3,6 +3,7 @@
 #include "types.h"
 #include <array>
 #include <vector>
+#include <string>
 
 static constexpr int KnightOffsets[8] = {31, 33, 18, 14, -31, -33, -18, -14};
 static constexpr int BishopOffsets[4] = {17, 15, -17, -15};
@@ -54,4 +55,10 @@ class Position {
 	bool isSquareAttacked(int sq, Color by) const;
 
 	bool inCheck(Color c) const; // might be needed for legal move generation
+
+	std::string toFEN() const;
+
+  private:
+	static char pieceToFenChar(int p);
+	static std::string squareToString(int sq);
 };

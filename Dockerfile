@@ -5,12 +5,14 @@ FROM debian:stable-slim AS build
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
+    git \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 # Copy project files into the image
 COPY CMakeLists.txt .
+COPY include include
 COPY src src
 COPY tests tests
 
