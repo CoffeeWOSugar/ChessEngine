@@ -40,6 +40,7 @@ class Position {
 	Position();
 
 	void setStartPosition();
+	void setFromFEN(const std::string &fen);
 
 	static inline bool isOnBoard(int sq) { return !(sq & 0x88); }
 
@@ -60,5 +61,6 @@ class Position {
 
   private:
 	static char pieceToFenChar(int p);
+	static int fenCharToPiece(char c);
 	static std::string squareToString(int sq);
 };

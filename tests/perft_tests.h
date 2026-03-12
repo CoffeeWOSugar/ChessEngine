@@ -5,10 +5,10 @@
 using u64 = unsigned long long;
 
 struct PerftCase {
-	std::string name; // description e.g. "Startpos d1-7"
+	std::string name;
+	std::string fen; // empty = start position
 	int depth;
 	u64 expected;
-	// later add: std::string fen;
 };
 
 void run_perft_tests();
