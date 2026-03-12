@@ -43,7 +43,9 @@ def tests_page():
 engine_proc: subprocess.Popen | None = None
 engine_lock = threading.Lock()
 
-_default_engine = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "chess"))
+_local_engine = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "chess"))
+_docker_engine = "/usr/local/bin/chess"
+_default_engine = _local_engine if os.path.isfile(_local_engine) else _docker_engine
 ENGINE_PATH = os.environ.get("CHESS_ENGINE_PATH", _default_engine)
 
 
