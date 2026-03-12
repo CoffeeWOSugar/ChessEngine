@@ -2,6 +2,7 @@
 #include "move.h"
 #include "types.h"
 #include "sstream"
+#include <sstream>
 
 static constexpr int SQ_A1 = Position::makeSquare(0, 0);
 static constexpr int SQ_E1 = Position::makeSquare(4, 0);
@@ -496,6 +497,93 @@ std::string Position::squareToString(int sq) {
 	s += char('a' + file);
 	s += char('1' + rank);
 	return s;
+}
+
+void Position::setFromFEN(const std::string &fen) {
+	board.fill(EMPTY);
+	stateStack.clear();
+
+	std::istringstream ss(fen);
+	std::string piecePlacement, sideStr, castlingStr, epStr;
+	int halfmove = 0, fullmove = 1;
+
+	ss >> piecePlacement >> sideStr >> castlingStr >> epStr >> halfmove >> fullmove;
+
+	// Piece placement — FEN ranks go from 8 (top) down to 1
+	int rank = 7, file = 0;
+	for (char c : piecePlacement) {
+		if (c == '/') {
+			--rank;
+			file = 0;
+		} else if (c >= '1' && c <= '8') {
+			file += c - '0';
+		} else {
+			int piece = fenCharToPiece(c);
+			if (piece != EMPTY)
+				board[makeSquare(file, rank)] = piece;
+			++file;
+		}
+	}
+
+	sideToMove = (sideStr == "b") ? BLACK : WHITE;
+
+	castlingRights = 0;
+	for (char c : castlingStr) {
+		switch (c) {
+		case 'K':
+			castlingRights |= WK_CASTLE;
+			break;
+		case 'Q':
+			castlingRights |= WQ_CASTLE;
+			break;
+		case 'k':
+			castlingRights |= BK_CASTLE;
+			break;
+		case 'q':
+			castlingRights |= BQ_CASTLE;
+			break;
+		}
+	}
+
+	epSquare = -1;
+	if (epStr.size() == 2 && epStr[0] >= 'a' && epStr[0] <= 'h' && epStr[1] >= '1' &&
+	    epStr[1] <= '8') {
+		epSquare = makeSquare(epStr[0] - 'a', epStr[1] - '1');
+	}
+
+	halfmoveClock = halfmove;
+	fullmoveNumber = fullmove;
+}
+
+int Position::fenCharToPiece(char c) {
+	switch (c) {
+	case 'P':
+		return WP;
+	case 'N':
+		return WN;
+	case 'B':
+		return WB;
+	case 'R':
+		return WR;
+	case 'Q':
+		return WQ;
+	case 'K':
+		return WK;
+	case 'p':
+		return BP;
+	case 'n':
+		return BN;
+	case 'b':
+		return BB;
+	case 'r':
+		return BR;
+	case 'q':
+		return BQ;
+	case 'k':
+		return BK;
+	default:
+		return EMPTY;
+	}
 }
 
 char Position::pieceToFenChar(int p) {

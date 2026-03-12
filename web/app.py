@@ -43,7 +43,10 @@ def tests_page():
 engine_proc: subprocess.Popen | None = None
 engine_lock = threading.Lock()
 
-ENGINE_PATH = "/usr/local/bin/chess"  # where Docker copies it
+_local_engine = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "chess"))
+_docker_engine = "/usr/local/bin/chess"
+_default_engine = _local_engine if os.path.isfile(_local_engine) else _docker_engine
+ENGINE_PATH = os.environ.get("CHESS_ENGINE_PATH", _default_engine)
 
 
 def _kill_engine():
@@ -81,8 +84,6 @@ def _rpc(cmd: dict) -> dict:
 
     line = engine_proc.stdout.readline()
     if not line:
-        raise RuntimeError("Engine terminated")
-    if line == "":
         rc = engine_proc.poll()
         raise RuntimeError(f"Engine terminated or produced no output (returncode={rc}).")
     try:
@@ -130,6 +131,7 @@ def run_tests():
             capture_output=True,
             text=True,
             check=False,
+            timeout=1800,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to run tests: {e}")

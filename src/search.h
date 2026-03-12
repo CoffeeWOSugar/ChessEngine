@@ -17,3 +17,11 @@ int alphaBeta(Position &pos, int depth, int alpha, int beta, const SearchLimits 
 
 // Iterative deepening root search with time limits
 bool searchBestMove(Position &pos, int maxDepth, const SearchLimits &limits, Move &bestMove);
+
+#ifdef USE_MPI
+bool searchBestMoveMPI(Position &pos, int maxDepth, int thinkTimeMs, Move &bestMove);
+
+void mpiWorkerLoop();
+
+void mpiBroadcastQuit();
+#endif
