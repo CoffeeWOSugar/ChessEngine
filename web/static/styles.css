@@ -291,6 +291,14 @@ body {
   outline-offset: -3px;
 }
 
+.square.last-move {
+  outline: 3px solid rgba(212, 0, 106, 0.55);
+  outline-offset: -3px;
+}
+
+.square.last-move.light { background: #e8e0a0; }
+.square.last-move.dark  { background: #3a8a5a; }
+
 /* Move input row */
 
 .move-row {

@@ -2,6 +2,7 @@
 
 let selectedFrom = null;
 let lastFen = null;
+let lastMove = null; // { from: 'e2', to: 'e4' }
 
 const PIECE_GLYPHS = {
   P: "♙", N: "♘", B: "♗", R: "♖", Q: "♕", K: "♔",
@@ -89,11 +90,16 @@ function renderBoardFromArray(b) {
   for (let r = 0; r < 8; r++) {
     for (let f = 0; f < 8; f++) {
       const sq = document.createElement("div");
-      sq.className = "square " + (((r + f) % 2 === 0) ? "light" : "dark");
-
       const fileChar = String.fromCharCode("a".charCodeAt(0) + f);
       const rankChar = String.fromCharCode("8".charCodeAt(0) - r);
-      sq.dataset.square = fileChar + rankChar;
+      const squareName = fileChar + rankChar;
+
+      let cls = "square " + (((r + f) % 2 === 0) ? "light" : "dark");
+      if (lastMove && (squareName === lastMove.from || squareName === lastMove.to)) {
+        cls += " last-move";
+      }
+      sq.className = cls;
+      sq.dataset.square = squareName;
 
       const piece = b ? b[r][f] : null;
       sq.textContent = piece ? (PIECE_GLYPHS[piece] || piece) : "";
@@ -181,6 +187,7 @@ async function newGame() {
     if (eng.event === "error") throw new Error(eng.message || "Engine error");
 
     lastFen = eng.fen;
+    lastMove = eng.engine_move ? { from: eng.engine_move.slice(0, 2), to: eng.engine_move.slice(2, 4) } : null;
     renderBoardFromFen(lastFen);
     updateStatusFromEngine(eng);
   } catch (e) {
@@ -197,6 +204,9 @@ async function sendMove() {
 
   // Optimistically render the human's move immediately
   const boardBefore = fenToBoardArray(lastFen);
+  const humanFrom = move.slice(0, 2);
+  const humanTo = move.slice(2, 4);
+  lastMove = { from: humanFrom, to: humanTo };
   if (boardBefore) renderBoardFromArray(applyMoveToBoard(boardBefore, move));
   moveInput.value = "";
   $("status").textContent = "Engine thinking...";
@@ -206,15 +216,20 @@ async function sendMove() {
 
     if (eng.event === "error") {
       // Revert to last known good position on illegal move
+      lastMove = null;
       renderBoardFromFen(lastFen);
       $("status").textContent = "Illegal move: " + (eng.message || "");
       return;
     }
 
     lastFen = eng.fen;
+    if (eng.engine_move && eng.engine_move.length >= 4) {
+      lastMove = { from: eng.engine_move.slice(0, 2), to: eng.engine_move.slice(2, 4) };
+    }
     renderBoardFromFen(lastFen);
     updateStatusFromEngine(eng);
   } catch (e) {
+    lastMove = null;
     renderBoardFromFen(lastFen);
     $("status").textContent = "Error: " + e.message;
   }
