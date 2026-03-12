@@ -25,6 +25,7 @@ set(SOURCES
   ${SRC_DIR}/move.cpp
   ${SRC_DIR}/search.cpp
   ${SRC_DIR}/engine_session.cpp
+  ${SRC_DIR}/opening_book.cpp
   ${TST_DIR}/perft_tests.cpp
 )
 

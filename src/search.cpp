@@ -156,7 +156,6 @@ bool searchBestMove(Position &pos, int maxDepth, const SearchLimits &limits, Mov
 	bool timeUp = false;
 	bool foundAny = false;
 	Move currentBest{};
-	int currentBestScore = std::numeric_limits<int>::min();
 
 	// Iterative deepening: 1..maxDepth
 	for (int depth = 1; depth <= maxDepth; ++depth) {
@@ -190,7 +189,6 @@ bool searchBestMove(Position &pos, int maxDepth, const SearchLimits &limits, Mov
 		}
 
 		// Completed this depth fully; update global best
-		currentBestScore = bestScoreThisDepth;
 		currentBest = bestMoveThisDepth;
 		foundAny = true;
 

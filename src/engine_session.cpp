@@ -82,6 +82,8 @@ bool EngineSession::applyHumanMove(const std::string &input, Move &outMove, std:
 				error = "Illegal move (makeMove rejected)";
 				return false;
 			}
+			// Record normalised move string (4 chars, or 5 for promotion)
+			moveHistory.push_back(input.size() >= 5 ? input.substr(0, 5) : input.substr(0, 4));
 			outMove = m;
 			return true;
 		}
@@ -92,6 +94,31 @@ bool EngineSession::applyHumanMove(const std::string &input, Move &outMove, std:
 }
 
 bool EngineSession::applyEngineMove(Move &outMove) {
+	// Consult opening book first
+	auto bookMove = lookupOpeningBook(moveHistory);
+	if (bookMove) {
+		// Validate the book move is actually legal in the current position
+		std::string mv = *bookMove;
+		std::string fromStr = mv.substr(0, 2);
+		std::string toStr = mv.substr(2, 2);
+		int fromSq = parseSquare(fromStr);
+		int toSq = parseSquare(toStr);
+		if (fromSq != -1 && toSq != -1) {
+			std::vector<Move> legalMoves;
+			GenerateLegalMoves(pos, legalMoves);
+			for (const Move &m : legalMoves) {
+				if (m.from == fromSq && m.to == toSq) {
+					if (pos.makeMove(m)) {
+						moveHistory.push_back(mv);
+						outMove = m;
+						return true;
+					}
+				}
+			}
+		}
+		// Book move wasn't legal — fall through to search
+	}
+
 	Move best{};
 
 #ifdef USE_MPI
@@ -131,6 +158,7 @@ bool EngineSession::applyEngineMove(Move &outMove) {
 	if (!pos.makeMove(best)) {
 		return false;
 	}
+	moveHistory.push_back(MoveToString(best));
 	outMove = best;
 	return true;
 }

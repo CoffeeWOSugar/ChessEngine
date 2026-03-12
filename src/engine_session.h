@@ -5,12 +5,13 @@
 #include "position.h"
 #include "movegen.h"
 #include "search.h"
+#include "opening_book.h"
 
 enum class GameResult { ONGOING, CHECKMATE, STALEMATE };
 
 struct EngineConfig {
 	int maxDepth = 10;
-	int thinkTimeMs = 2000;
+	int thinkTimeMs = 4000;
 };
 
 class EngineSession {
@@ -23,6 +24,7 @@ class EngineSession {
 	void newGame(Color humanSide) {
 		pos.setStartPosition();
 		humanColor = humanSide;
+		moveHistory.clear();
 	}
 
 	const Position &position() const { return pos; }
@@ -49,6 +51,7 @@ class EngineSession {
 	EngineConfig config;
 	Position pos;
 	Color humanColor;
+	std::vector<std::string> moveHistory;
 
 	int parseSquare(const std::string &s) const;
 	int promotionFromChar(char c, Color side) const;
