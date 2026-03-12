@@ -156,16 +156,15 @@ async function newGame() {
   $("status").textContent = "Starting...";
   updateOutput("");
 
+  const humanColor = $("colorSelect").value;
+
   try {
-    const eng = await apiNewGame("w"); // you can make this selectable later
+    const eng = await apiNewGame(humanColor);
     if (eng.event === "error") throw new Error(eng.message || "Engine error");
 
     lastFen = eng.fen;
     renderBoardFromFen(lastFen);
     updateStatusFromEngine(eng);
-
-    // Debug payload
-    updateOutput(JSON.stringify(eng, null, 2));
   } catch (e) {
     $("status").textContent = "Error: " + e.message;
   }
@@ -189,9 +188,6 @@ async function sendMove() {
     lastFen = eng.fen;
     renderBoardFromFen(lastFen);
     updateStatusFromEngine(eng);
-
-    // Debug payload
-    updateOutput(JSON.stringify(eng, null, 2));
 
     moveInput.value = "";
   } catch (e) {
@@ -221,9 +217,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!lastFen) return;
 
     if (!selectedFrom) {
+      if (!getPieceAtSquareFromFen(lastFen, sq)) return;
       selectedFrom = sq;
       setSelectedSquare(sq);
-      $("moveInput").value = sq; // optional
+      $("moveInput").value = sq;
       return;
     }
 

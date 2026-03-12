@@ -173,7 +173,8 @@ a:hover {
   margin-bottom: 0.75rem;
 }
 
-.game-controls input[type="text"] {
+.game-controls input[type="text"],
+.game-controls select {
   background: #001120;
   border: 1px solid #374151;
   border-radius: 0.5rem;

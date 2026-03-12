@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "engine_session.h"
+#include "perft.h"
 #include "../tests/perft_tests.h"
 #include "utils.h"
 #include <nlohmann/json.hpp>
@@ -108,10 +109,8 @@ int runCliGame() {
 int runPerft(int depth) {
 	Position pos;
 	pos.setStartPosition();
-	// uint64_t nodes = perft(pos, depth);
-	// std::cout << nodes << std::endl;
-	// TMP
-	return depth;
+	uint64_t nodes = Perft(pos, depth);
+	std::cout << nodes << std::endl;
 	return 0;
 }
 
