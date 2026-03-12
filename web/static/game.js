@@ -12,12 +12,6 @@ function $(id) {
   return document.getElementById(id);
 }
 
-function updateOutput(text) {
-  const out = $("output");
-  out.textContent = text || "";
-  out.scrollTop = out.scrollHeight;
-}
-
 function focusMoveInput() {
   const el = $("moveInput");
   el.focus();
@@ -179,7 +173,6 @@ async function apiMove(move) {
 
 async function newGame() {
   $("status").textContent = "Starting...";
-  updateOutput("");
 
   const humanColor = $("colorSelect").value;
 

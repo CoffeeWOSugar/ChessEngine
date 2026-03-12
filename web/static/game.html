@@ -2,45 +2,50 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Chess Engine – Game</title>
+    <title>Chess Engine</title>
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body class="game-body">
     <header class="app-header">
-      <h1 class="app-header__title">Play Chess</h1>
       <button class="header-btn" id="backBtn">← Back</button>
+      <h1 class="app-header__title">Chess Engine</h1>
+      <div class="header-controls">
+        <select id="colorSelect">
+          <option value="w">White</option>
+          <option value="b">Black</option>
+        </select>
+        <button class="btn btn-primary" id="newGameBtn">New Game</button>
+      </div>
     </header>
 
     <main class="app-main">
-      <div class="game-controls">
-        <label>
-          Play as:
-          <select id="colorSelect">
-            <option value="w">White</option>
-            <option value="b">Black</option>
-          </select>
-        </label>
-        <button class="btn btn-primary" id="newGameBtn">New Game</button>
-        <label>
-          Your move:
-          <input
-            type="text"
-            id="moveInput"
-            placeholder="e2e4, e7e8q..."
-            autocomplete="off"
-          />
-        </label>
-        <button class="btn btn-secondary" id="submitBtn">Submit</button>
+      <div id="status" class="game-status">Start a new game.</div>
+
+      <div class="board-wrapper">
+        <div class="rank-labels">
+          <span>8</span><span>7</span><span>6</span><span>5</span>
+          <span>4</span><span>3</span><span>2</span><span>1</span>
+        </div>
+        <div class="board-col">
+          <div id="board" class="board" aria-label="Chessboard"></div>
+          <div class="file-labels">
+            <span>a</span><span>b</span><span>c</span><span>d</span>
+            <span>e</span><span>f</span><span>g</span><span>h</span>
+          </div>
+        </div>
       </div>
 
-      <div id="status" class="game-status">No game started yet.</div>
-
-      <div id="board" class="board" aria-label="Chessboard"></div>
-
-      <div id="output" class="output-box game-output" style="margin-top: 16px;"></div>
+      <div class="move-row">
+        <input
+          type="text"
+          id="moveInput"
+          placeholder="e2e4 or click to move…"
+          autocomplete="off"
+        />
+        <button class="btn btn-secondary" id="submitBtn">Submit</button>
+      </div>
     </main>
 
     <script src="/static/game.js"></script>
   </body>
 </html>
-
