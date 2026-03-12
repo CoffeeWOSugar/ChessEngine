@@ -88,10 +88,8 @@ function maybeAddPromotion(moveStr, fen) {
   return moveStr + p;
 }
 
-function renderBoardFromFen(fen) {
+function renderBoardFromArray(b) {
   const boardEl = $("board");
-  const b = fenToBoardArray(fen);
-
   boardEl.innerHTML = "";
 
   for (let r = 0; r < 8; r++) {
@@ -99,11 +97,9 @@ function renderBoardFromFen(fen) {
       const sq = document.createElement("div");
       sq.className = "square " + (((r + f) % 2 === 0) ? "light" : "dark");
 
-      // Map (r,f) where r=0 is rank 8, to algebraic
       const fileChar = String.fromCharCode("a".charCodeAt(0) + f);
       const rankChar = String.fromCharCode("8".charCodeAt(0) - r);
-      const alg = fileChar + rankChar;
-      sq.dataset.square = alg;
+      sq.dataset.square = fileChar + rankChar;
 
       const piece = b ? b[r][f] : null;
       sq.textContent = piece ? (PIECE_GLYPHS[piece] || piece) : "";
@@ -111,6 +107,35 @@ function renderBoardFromFen(fen) {
       boardEl.appendChild(sq);
     }
   }
+}
+
+function renderBoardFromFen(fen) {
+  renderBoardFromArray(fenToBoardArray(fen));
+}
+
+// Optimistically apply a move string to a board array (deep-copied).
+function applyMoveToBoard(board, moveStr) {
+  const b = board.map(row => [...row]);
+
+  const fromFile = moveStr.charCodeAt(0) - "a".charCodeAt(0);
+  const fromRank = moveStr.charCodeAt(1) - "1".charCodeAt(0);
+  const toFile   = moveStr.charCodeAt(2) - "a".charCodeAt(0);
+  const toRank   = moveStr.charCodeAt(3) - "1".charCodeAt(0);
+
+  const fromR = 7 - fromRank;
+  const toR   = 7 - toRank;
+
+  const piece = b[fromR][fromFile];
+  b[fromR][fromFile] = null;
+
+  if (moveStr.length >= 5) {
+    const promoChar = moveStr[4];
+    b[toR][toFile] = (piece === piece.toUpperCase()) ? promoChar.toUpperCase() : promoChar.toLowerCase();
+  } else {
+    b[toR][toFile] = piece;
+  }
+
+  return b;
 }
 
 function updateStatusFromEngine(engine) {
@@ -177,10 +202,18 @@ async function sendMove() {
   const move = moveInput.value.trim();
   if (!move) return;
 
+  // Optimistically render the human's move immediately
+  const boardBefore = fenToBoardArray(lastFen);
+  if (boardBefore) renderBoardFromArray(applyMoveToBoard(boardBefore, move));
+  moveInput.value = "";
+  $("status").textContent = "Engine thinking...";
+
   try {
     const eng = await apiMove(move);
 
     if (eng.event === "error") {
+      // Revert to last known good position on illegal move
+      renderBoardFromFen(lastFen);
       $("status").textContent = "Illegal move: " + (eng.message || "");
       return;
     }
@@ -188,9 +221,8 @@ async function sendMove() {
     lastFen = eng.fen;
     renderBoardFromFen(lastFen);
     updateStatusFromEngine(eng);
-
-    moveInput.value = "";
   } catch (e) {
+    renderBoardFromFen(lastFen);
     $("status").textContent = "Error: " + e.message;
   }
 
