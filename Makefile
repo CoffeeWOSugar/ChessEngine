@@ -28,13 +28,30 @@ $(BIN): $(OBJS)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Clean up
-.PHONY: clean
-clean:
-	rm -rf $(OBJS) $(BIN)
-
 # Format
 .PHONY: format
 format:
 	clang-format -i $(SRC_DIR)/*.cpp $(SRC_DIR)/*.h $(TST_DIR)/*.cpp $(TST_DIR)/*.h
+
+MPI_CXX      := mpicxx
+MPI_CXXFLAGS := $(CXXFLAGS) -DUSE_MPI
+MPI_BIN      := chess_mpi
+
+MPI_OBJS := $(SRCS:.cpp=.mpi.o)
+
+# Link MPI binary
+$(MPI_BIN): $(MPI_OBJS)
+	$(MPI_CXX) $(MPI_CXXFLAGS) -o $@ $^
+
+# Compile MPI objects
+%.mpi.o: %.cpp
+	$(MPI_CXX) $(MPI_CXXFLAGS) -c $< -o $@
+
+.PHONY: mpi
+mpi: $(MPI_BIN)
+
+# Clean up
+.PHONY: clean
+clean:
+	rm -rf $(OBJS) $(MPI_OBJS) $(BIN) $(MPI_BIN)
 

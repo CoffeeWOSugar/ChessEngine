@@ -8,6 +8,11 @@
 #include "utils.h"
 #include <nlohmann/json.hpp>
 
+#ifdef USE_MPI
+#include <mpi.h>
+#include "search.h"
+#endif
+
 using json = nlohmann::json;
 
 // Forward declarations
@@ -201,28 +206,69 @@ int runProtocol() {
 }
 
 int main(int argc, char *argv[]) {
+#ifdef USE_MPI
+	MPI_Init(&argc, &argv);
+
+	int worldRank = 0, worldSize = 1;
+	MPI_Comm_rank(MPI_COMM_WORLD, &worldRank);
+	MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
+
+	// All non-root ranks become workers and never touch stdin/stdout.
+	if (worldRank != 0) {
+		mpiWorkerLoop();
+		MPI_Finalize();
+		return 0;
+	}
+#endif
+
+	int rc = 0;
+
 	if (argc > 1) {
 		std::string arg1 = argv[1];
 
 		if (arg1 == "--run-tests") {
 			run_perft_tests();
+			rc = 0;
+#ifdef USE_MPI
+			mpiBroadcastQuit();
+			MPI_Finalize();
+#endif
 			return 0;
 		}
 
 		if (arg1 == "--perft") {
 			if (argc < 3) {
 				std::cerr << "Usage: chess --perft <depth>\n";
+#ifdef USE_MPI
+				mpiBroadcastQuit();
+				MPI_Finalize();
+#endif
 				return 1;
 			}
 			int depth = std::stoi(argv[2]);
-			return runPerft(depth);
+			rc = runPerft(depth);
+#ifdef USE_MPI
+			mpiBroadcastQuit();
+			MPI_Finalize();
+#endif
+			return rc;
 		}
 
 		if (arg1 == "--protocol") {
-			return runProtocol();
+			rc = runProtocol();
+#ifdef USE_MPI
+			mpiBroadcastQuit();
+			MPI_Finalize();
+#endif
+			return rc;
 		}
 	}
 
 	// Default: interactive CLI game
-	return runCliGame();
+	rc = runCliGame();
+#ifdef USE_MPI
+	mpiBroadcastQuit();
+	MPI_Finalize();
+#endif
+	return rc;
 }
